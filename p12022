@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv)
+{
+	FILE *entrada, *saida;
+
+	int c;
+
+	if(argc != 3)
+	{
+		fprintf(stderr, "Erro na chamada da função");
+		fprintf(stderr, "favor seguir formato: %s [Arquivo Entrada] [Arquivo Saida]");
+		return 1;
+	}
+
+	entrada = fopen(argv[1], "rb");
+	if(!entrada)
+	{
+		fprintf(stderr,"Erro ao abrir o arquivo para leitura");
+		return 1;
+	}
+	saida = fopen(argv[1], "wb");
+	if(!entrada)
+	{
+		fprintf(stderr,"Erro ao abrir o arquivo para alteração");
+		return 1;
+	}
+    
+	c = fgetc(entrada);
+	while(c != EOF)
+	{
+		if(c == '\n')
+		{
+			fputc('\r', saida);
+			fputc('\n', saida);
+		}
+		else
+		{
+			fputc(c, saida);
+		}
+		c = fgetc(entrada);
+	}
+	
+	fclose(entrada);
+	return 0;
+}
+
+int main(int argc, char **argv)
+{
+	FILE *entrada;
+	int  c, i = 0;
+	int byte[256];
+	memset(byte, 0, sizeof(byte));
+
+	if(argc != 2)
+	{
+		fprintf(stderr, "Erro na chamada do arquivo");
+		return 1;
+	}
+
+	entrada = fopen(argv[1], "rb");
+	if(!entrada)
+	{
+		fprintf(stderr, "Erro ao abrir o arquivo para leitura");
+		return 1;
+	}
+
+	c = fgetc(entrada);
+	while(c != EOF)
+	{
+
+		byte[c]++;
+		c = fgetc(entrada);
+	}
+
+	fclose(entrada);
+	return 0;
+}
+
+//questão 3
+#include <stdio.h>
+#include <string.h>
+
+struct _Registro
+{
+	char cpf[15];
+	char curso[20];
+	char dataNascimento[11];
+	char sexo;
+	char email[40];
+	char opcaoQuadro;
+};
+typedef struct _Registro Registro;
+
+int compara(const void *e1, const void *e2)
+{
+	return(strcmp(((Registro*)e1) -> cpf, ((Registro*)e2) -> cpf));
+}
+
+int main(int argc, char **argv)
+{
+	FILE *entrada1, *entrada2, *saida;
+	Registro ea, eb;
+	int qa, qb;
+
+	entrada1 = fopen("candidatos2021.dat", "rb");
+	entrada2 = fopen("cadidatos2022.dat", "rb");
+	saida = fopen("saida.dat", "wb");
+
+	qa = fread(&ea, sizeof(Registro), 1, entrada1); 
+	qb = fread(&eb, sizeof(Registro), 1, entrada2);
+	
+	while(!eof(entrada1) && !eof(entrada2))
+	{
+		if(compara(&ea, &eb) == 0)
+		{
+			fwrite(&ea, sizeof(Registro), 1, saida);
+			qa = fread(&ea, sizeof(Registro), 1, entrada1);
+        	qb = fread(&eb, sizeof(Registro), 1, entrada2);
+		}
+		else if(compara(&ea, &eb) < 0)
+    	{
+        	qa = fread(&ea, sizeof(Registro), 1, entrada1);
+    	}
+    	else
+    	{
+        	qb = fread(&eb, sizeof(Registro), 1, entrada2);
+    	}
+
+	}
+
+}
